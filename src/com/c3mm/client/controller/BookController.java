@@ -39,10 +39,12 @@ public class BookController
 		view.printBookInfo(
 				book.getTitle(),
 				book.getAuthor(),
+				book.getInStock(),
 				book.getPubDate(),
-				book.getStatus(),
-				book.getLocation(),
-				book.getIsbn()
+				book.getIsbn(),
+				book.getCountry(),
+				book.getType(),
+				book.getLanguage()
 				);
 	}
 }

@@ -4,68 +4,66 @@ import java.net.*;
 
 public class C3Client
 {
-	private BookModel book = null;
-	private static String[] values = null;
+	/* Constants for program configuration */
+	private static final String NOT_FOUND = "no results found";
+	private static final String DONE = "done.";
+	private static final String DELIMITER = ";"; // string delimiter to break the server's response into an array
+	private static final String SERVER = "Server-> ";
+	private static final String CLIENT = "Client-> ";
+	private static final String UNKNOWN_HOST = "The specified host could not be found: ";
+	private static final String IO_HOST = "Couldn't get I/O for the connection to ";
+	private static final String HOST = "localhost"; //change to connect across computers
+	private static final int PORT = 4000; //change to connect across computers
 	
-	public static void runClient(String hostName, int port)
+	private String[] values = null;
+	
+	public void sendRequest(String table, String value)
 	{
-		try (Socket socket = new Socket(hostName, port);
-				PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));)
+		try (Socket socket = new Socket(HOST, PORT); // connect to the server socket. 
+				PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // use this to send requests to server
+				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));) // use this to read response from server 
 		{
 			String fromServer;
-			String fromUser;
+			String fromClient;
 			
-			while ((fromServer = in.readLine()) != null)
+			while ((fromServer = in.readLine()) != null) // read from the server
 			{
-				if (fromServer.equals("done."))
-					break;
-
-				System.out.println("Server: " + fromServer);
-				setValues(fromServer.split(";"));
+				System.out.println(SERVER + fromServer); // tell me what the server said
 				
-				fromUser = getQueryType();
-				if (fromUser != null)
+				if ( fromServer.equals(DONE) ) // if the server sends "done.", exit the loop and close connection
+					break;
+				
+				if( fromServer.contains(NOT_FOUND) ) // if the query returns no results
+					break;
+				
+				if( fromServer.contains(DELIMITER) )
 				{
-					System.out.println("Client: " + fromUser);
-					out.println(fromUser);
+					values = fromServer.split(DELIMITER); // get the values returned by query and split them into an array then break the loop
+					break;
+				}
+				
+				fromClient = table + DELIMITER + value; // concatenate the params needed for query
+				if (fromClient != null)
+				{
+					System.out.println(CLIENT + fromClient); // show me what I am sending to the server
+					out.println(fromClient); // send it to the server
 				}
 			}
 		}
 		catch (UnknownHostException e)
 		{
-			System.err.println("Don't know about host " + hostName);
+			System.err.println(UNKNOWN_HOST + HOST);
 			System.exit(1);
 		}
 		catch (IOException e)
 		{
-			System.err.println("Couldn't get I/O for the connection to " + hostName);
+			System.err.println(IO_HOST + HOST);
 			System.exit(1);
 		}
 	}
-
-	private static String getQueryType()
-	{
-		return "book;1234567890";
-	}
-
-	public BookModel getBook()
-	{
-		return book;
-	}
-
-	public void setBook(BookModel book)
-	{
-		this.book = book;
-	}
-
-	public static String[] getValues()
+	
+	public String[] getValues()
 	{
 		return values;
-	}
-
-	public static void setValues(String[] values)
-	{
-		C3Client.values = values;
 	}
 }

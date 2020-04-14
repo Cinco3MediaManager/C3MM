@@ -12,21 +12,22 @@ public class C3ServerThread extends Thread
 		this.socket = socket;
 	}
 	
+	@Override
 	public void run()
 	{
 		try (PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));)
 		{
 			String inputLine, outputLine;
-			DBAProtocol dbap = new DBAProtocol();
-			outputLine = dbap.processInput(null);
-			out.println(outputLine);
+			DBAProtocol dbap = new DBAProtocol(); // start the communication protocol
+			outputLine = dbap.processInput(null); // get the first server response
+			out.println(outputLine); // send it to the client
 			
-			while ((inputLine = in.readLine()) != null)
+			while ((inputLine = in.readLine()) != null) // read from the client
 			{
-				outputLine = dbap.processInput(inputLine);
-				out.println(outputLine);
-				if (outputLine.equals("done"))
+				outputLine = dbap.processInput(inputLine); // get the server's response to the clients request
+				out.println(outputLine); // send the response to the client
+				if (outputLine.equals("done")) // if server response is done quit loop close connection
 					break;
 			}
 			socket.close();

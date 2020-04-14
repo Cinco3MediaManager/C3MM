@@ -4,18 +4,22 @@ public class BookView
 {
 	public void printBookInfo(
 			String title, 
-			String author, 
+			String author,
+			int inStock,
 			String pubDate, 
-			String status, 
-			String location,
-			String isbn)
+			String isbn, 
+			String country,
+			String type,
+			String language)
 	{
 		System.out.println(Columns.TITLE + ": " + title);
 		System.out.println(Columns.AUTHOR + ": " + author);
+		System.out.println(Columns.IN_STOCK + ": " + author);
 		System.out.println(Columns.PUBDATE + ": " + pubDate);
-		System.out.println(Columns.STATUS + ": " + status);
-		System.out.println(Columns.LOCATION + ": " + location);
 		System.out.println(Columns.ISBN + ": " + isbn);
+		System.out.println(Columns.COUNTRY + ": " + country);
+		System.out.println(Columns.TYPE + ": " + type);
+		System.out.println(Columns.LANG + ": " + language);
 		System.out.println();
 	}
 }

@@ -2,11 +2,12 @@ package com.c3mm.client.model;
 
 public abstract class AbstractMediaModel
 {
-	private int rec_id = 0;
-	private String status;
+	private int rec_id;
+	private int inStock;
 	private String title;
-	private String location;
-	private String pubDate; // publication date
+	private String country;
+	private String type;
+	private String language;
 	
 	/**
 	 * Default No arg constructor Initializes all the instance variables to default
@@ -14,50 +15,42 @@ public abstract class AbstractMediaModel
 	 */
 	public AbstractMediaModel()
 	{
-		this.setRecId(0);
-		this.status = "";
-		this.title = "";
-		this.location = "";
-		this.pubDate = "";
+		rec_id = 0;
+		inStock = 0;
+		title = "";
+		setCountry("");
+		type = "";
+		language = "";
 	}
 	
 	/**
-	 * Convenience method to create a Model object with all parameters given
-	 * @param record_id
-	 * @param status
-	 * @param author
+	 * Create media object with all needed params
+	 * @param rec_id
+	 * @param inStock
 	 * @param title
-	 * @param location
-	 * @param pubDate
+	 * @param country
+	 * @param type
+	 * @param language
 	 */
-	public AbstractMediaModel(int rec_id, String status, String title, String location,
-			String pubDate)
+	public AbstractMediaModel(int rec_id, int inStock, String title, String country, String type, String language)
 	{
+		super();
 		this.rec_id = rec_id;
-		this.status = status;
+		this.inStock = inStock;
 		this.title = title;
-		this.location = location;
-		this.pubDate = pubDate;
+		this.setCountry(country);
+		this.type = type;
+		this.language = language;
 	}
 	
 	public int getRecId()
 	{
 		return rec_id;
 	}
-	
+
 	public void setRecId(int rec_id)
 	{
 		this.rec_id = rec_id;
-	}
-	
-	public String getStatus()
-	{
-		return status;
-	}
-	
-	public void setStatus(String status)
-	{
-		this.status = status;
 	}
 	
 	public String getTitle()
@@ -70,23 +63,43 @@ public abstract class AbstractMediaModel
 		this.title = title;
 	}
 	
-	public String getLocation()
+	public int getInStock()
 	{
-		return location;
+		return inStock;
 	}
-	
-	public void setLocation(String location)
+
+	public void setInStock(int inStock)
 	{
-		this.location = location;
+		this.inStock = inStock;
 	}
-	
-	public String getPubDate()
+
+	public String getType()
 	{
-		return pubDate;
+		return type;
 	}
-	
-	public void setPubDate(String pubDate)
+
+	public void setType(String type)
 	{
-		this.pubDate = pubDate;
+		this.type = type;
+	}
+
+	public String getLanguage()
+	{
+		return language;
+	}
+
+	public void setLanguage(String language)
+	{
+		this.language = language;
+	}
+
+	public String getCountry()
+	{
+		return country;
+	}
+
+	public void setCountry(String country)
+	{
+		this.country = country;
 	}
 }
