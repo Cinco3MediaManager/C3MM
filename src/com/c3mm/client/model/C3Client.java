@@ -43,6 +43,7 @@ public class C3Client
 				}
 				
 				fromClient = table + DELIMITER + value; // concatenate the params needed for query
+				
 				if (fromClient != null)
 				{
 					System.out.println(CLIENT + fromClient); // show me what I am sending to the server

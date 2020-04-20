@@ -25,7 +25,7 @@ public class BookTest
 		
 		controller.updateView();
 		
-		controller.setBookAuthor("Chechi");
+		controller.setBookAuthor("The Author");
 		controller.setBookName("My Book");
 		controller.updateView();
 		

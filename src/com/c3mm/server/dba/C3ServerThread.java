@@ -5,6 +5,7 @@ import java.io.*;
 public class C3ServerThread extends Thread
 {
 	private Socket socket = null;
+	private final static String DONE = "done";
 	
 	public C3ServerThread(Socket socket)
 	{
@@ -25,10 +26,11 @@ public class C3ServerThread extends Thread
 			
 			while ((inputLine = in.readLine()) != null) // read from the client
 			{
+				if (outputLine.equals(DONE)) // if server response is done quit loop close connection
+					break;
+				
 				outputLine = dbap.processInput(inputLine); // get the server's response to the clients request
 				out.println(outputLine); // send the response to the client
-				if (outputLine.equals("done")) // if server response is done quit loop close connection
-					break;
 			}
 			socket.close();
 		}

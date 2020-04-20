@@ -5,20 +5,16 @@ import java.io.*;
 
 public class C3MultiServer
 {
+	private final static int PORT = 4000; 
+	
 	public static void main(String[] args) throws IOException
 	{
-		if (args.length != 1)
-		{
-			System.err.println("Usage: java C3MultiServer <port number>");
-			System.exit(1);
-		}
 		
-		int portNumber = Integer.parseInt(args[0]);
 		boolean listening = true;
 		
-		try (ServerSocket serverSocket = new ServerSocket(portNumber))
+		try (ServerSocket serverSocket = new ServerSocket(PORT))
 		{
-			System.out.println("Server Listening in port " + portNumber);
+			System.out.println("Server Listening in port " + PORT);
 			while (listening)
 			{
 				new C3ServerThread(serverSocket.accept()).start();
@@ -27,7 +23,7 @@ public class C3MultiServer
 		}
 		catch (IOException e)
 		{
-			System.err.println("Could not listen on port " + portNumber);
+			System.err.println("Could not listen on port " + PORT);
 			System.exit(-1);
 		}
 	}

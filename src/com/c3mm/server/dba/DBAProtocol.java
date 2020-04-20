@@ -6,6 +6,8 @@ public class DBAProtocol
 	private static final int QUERY_SENT = 2;
 	
 	private static final String BOOKS = "books";
+	private static final String DONE = "done.";
+	private static final String CONNECTING = "Connecting to server...";
 	
 	private int state = WAITING; // we always start waiting
 	
@@ -21,7 +23,7 @@ public class DBAProtocol
 		
 		if (state == WAITING)
 		{
-			theOutput = "Connecting to server..";
+			theOutput = CONNECTING;
 			state = TRY_QUERY;
 		}
 		else if (state == TRY_QUERY)
@@ -35,7 +37,7 @@ public class DBAProtocol
 		}
 		else
 		{
-			theOutput = "done.";
+			theOutput = DONE;
 			state = WAITING;
 		}
 		return theOutput;
