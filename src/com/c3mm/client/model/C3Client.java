@@ -1,6 +1,7 @@
 package com.c3mm.client.model;
 import java.io.*;
 import java.net.*;
+import java.util.Vector;
 
 public class C3Client
 {
@@ -15,9 +16,10 @@ public class C3Client
 	private static final String HOST = "localhost"; //change to connect across computers
 	private static final int PORT = 4000; //change to connect across computers
 	
-	private String[] values = null;
+//	private String[] values = null;
+	Vector<String> results = new Vector<String>();
 	
-	public void sendRequest(String table, String value)
+	private void sendRequest(String table, String value)
 	{
 		try (Socket socket = new Socket(HOST, PORT); // connect to the server socket. 
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // use this to send requests to server
@@ -26,6 +28,7 @@ public class C3Client
 			String fromServer;
 			String fromClient;
 			
+			// This loop executes every time the server sends a response
 			while ((fromServer = in.readLine()) != null) // read from the server
 			{
 				System.out.println(SERVER + fromServer); // tell me what the server said
@@ -38,16 +41,26 @@ public class C3Client
 				
 				if( fromServer.contains(DELIMITER) )
 				{
-					values = fromServer.split(DELIMITER); // get the values returned by query and split them into an array then break the loop
-					break;
+					results.add(fromServer);
+					
+//					values = fromServer.split(DELIMITER); // get the values returned by query and split them into an array then break the loop
 				}
 				
+				if( fromServer.equals("single"))
+				{
+					break;
+				}
+//				
 				fromClient = table + DELIMITER + value; // concatenate the params needed for query
+//				fromClient = "books;all"; // concatenate the params needed for query
+				
 				
 				if (fromClient != null)
 				{
 					System.out.println(CLIENT + fromClient); // show me what I am sending to the server
 					out.println(fromClient); // send it to the server
+//					sent = true;
+					
 				}
 			}
 		}
@@ -63,8 +76,35 @@ public class C3Client
 		}
 	}
 	
-	public String[] getValues()
-	{
-		return values;
+//	public String[] getValues()
+//	{
+//		return values;
+//	}
+
+	public Vector<String> getResults() {
+		return results;
+	}
+
+	public void setResults(Vector<String> results) {
+		this.results = results;
+	}
+
+	public BookModel getModel(String table, String param) {
+		
+		sendRequest(table, param);
+		
+		String[] values = results.get(0).split(DELIMITER);
+				
+		return new BookModel(
+				Integer.parseInt(values[0]), //id
+				values[1], //title 
+				values[2], //author
+				Integer.parseInt(values[3]), //in-stock
+				values[4], //publication date
+				values[5], //ISBN
+				values[6], //country
+				values[7], //type
+				values[8]  //language
+			);
 	}
 }

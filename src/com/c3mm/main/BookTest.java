@@ -13,11 +13,14 @@ public class BookTest
 	
 	public static void main(String[] args)
 	{
-		C3Client bookClient = new C3Client();
-		bookClient.sendRequest( TABLE, PARAM );
-		String[] values = bookClient.getValues();
+		C3Client client = new C3Client();
 		
-		BookModel model = new BookModel(values);
+		BookModel model = client.getModel(TABLE, PARAM);
+		
+		
+//		String[] values = client.getValues();
+//		
+//		BookModel model = new BookModel(values);
 		BookView view = new BookView();
 		BookController controller = new BookController(model, view);
 		System.out.println(controller.getBookAuthor());
