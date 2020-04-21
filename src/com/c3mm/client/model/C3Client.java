@@ -1,6 +1,8 @@
 package com.c3mm.client.model;
 import java.io.*;
 import java.net.*;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 public class C3Client
@@ -19,11 +21,11 @@ public class C3Client
 //	private String[] values = null;
 	Vector<String> results = new Vector<String>();
 	
-	private void sendRequest(String table, String value)
+	private void sendRequest(String table, String field, String value)
 	{
 		try (Socket socket = new Socket(HOST, PORT); // connect to the server socket. 
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // use this to send requests to server
-				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));) // use this to read response from server 
+				BufferedReader in = new BufferedReader( new InputStreamReader(socket.getInputStream()) ); ) // use this to read response from server 
 		{
 			String fromServer;
 			String fromClient;
@@ -36,31 +38,26 @@ public class C3Client
 				if ( fromServer.equals(DONE) ) // if the server sends "done.", exit the loop and close connection
 					break;
 				
-				if( fromServer.contains(NOT_FOUND) ) // if the query returns no results
+				if( fromServer.contains(NOT_FOUND) ) // if the query returns no results exit the loop
 					break;
 				
-				if( fromServer.contains(DELIMITER) )
+				if( fromServer.contains(DELIMITER) ) // the delimiter indicates we received something back
 				{
 					results.add(fromServer);
-					
-//					values = fromServer.split(DELIMITER); // get the values returned by query and split them into an array then break the loop
+					continue; // skip to read the next server response
 				}
 				
-				if( fromServer.equals("single"))
-				{
-					break;
-				}
-//				
-				fromClient = table + DELIMITER + value; // concatenate the params needed for query
-//				fromClient = "books;all"; // concatenate the params needed for query
-				
+				/*
+				 * Send the needed arguments for the query.
+				 * The minimum parameter is the table name.
+				 * E.G.: "books;ISBN;1234"
+				 */
+				fromClient = table + DELIMITER + field + DELIMITER + value; // concatenate the parameters needed for query
 				
 				if (fromClient != null)
 				{
 					System.out.println(CLIENT + fromClient); // show me what I am sending to the server
 					out.println(fromClient); // send it to the server
-//					sent = true;
-					
 				}
 			}
 		}
@@ -76,35 +73,47 @@ public class C3Client
 		}
 	}
 	
-//	public String[] getValues()
-//	{
-//		return values;
-//	}
-
-	public Vector<String> getResults() {
-		return results;
-	}
-
-	public void setResults(Vector<String> results) {
-		this.results = results;
-	}
-
-	public BookModel getModel(String table, String param) {
-		
-		sendRequest(table, param);
-		
+	public BookModel getModel(String field, String param)
+	{
+		sendRequest("books", field, param);
 		String[] values = results.get(0).split(DELIMITER);
-				
-		return new BookModel(
-				Integer.parseInt(values[0]), //id
-				values[1], //title 
-				values[2], //author
-				Integer.parseInt(values[3]), //in-stock
-				values[4], //publication date
-				values[5], //ISBN
-				values[6], //country
-				values[7], //type
-				values[8]  //language
+		
+		return new BookModel(Integer.parseInt(values[0]), // id
+				values[1], // title
+				values[2], // author
+				Integer.parseInt(values[3]), // in-stock
+				values[4], // publication date
+				values[5], // ISBN
+				values[6], // country
+				values[7], // type
+				values[8]  // language
+		);
+	}
+	
+	public List<BookModel> getAll(int limit)
+	{
+		sendRequest("books", "", "");
+		
+		List<BookModel> books = new LinkedList<>();
+		
+		for (String row : results)
+		{
+			String[] values = row.split(DELIMITER);
+			books.add(
+				new BookModel(Integer.parseInt(values[0]), // id
+					values[1], // title
+					values[2], // author
+					Integer.parseInt(values[3]), // in-stock
+					values[4], // publication date
+					values[5], // ISBN
+					values[6], // country
+					values[7], // type
+					values[8]  // language
+					)
 			);
+		}
+		
+		return books;
+		
 	}
 }

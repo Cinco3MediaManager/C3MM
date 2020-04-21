@@ -1,5 +1,7 @@
 package com.c3mm.main;
 
+import java.util.List;
+
 import com.c3mm.client.controller.BookController;
 import com.c3mm.client.model.BookModel;
 import com.c3mm.client.model.C3Client;
@@ -8,21 +10,23 @@ import com.c3mm.client.view.BookView;
 public class BookTest
 {
 	/* Constants for testing for now */
-	private final static String TABLE = "books";
-	private final static String PARAM = "9781503290563";
+	private final static String FIELD = "isbn";
+	private final static String VALUE = "9781503290563";
 	
 	public static void main(String[] args)
 	{
 		C3Client client = new C3Client();
+		List<BookModel> books = client.getAll(0);
 		
-		BookModel model = client.getModel(TABLE, PARAM);
+		for (BookModel book : books)
+		{
+			System.out.println(book.getAuthor());
+		}
 		
-		
-//		String[] values = client.getValues();
-//		
-//		BookModel model = new BookModel(values);
+		BookModel model = client.getModel(FIELD, VALUE);
 		BookView view = new BookView();
 		BookController controller = new BookController(model, view);
+		
 		System.out.println(controller.getBookAuthor());
 		System.out.println(controller.getBookName());
 		

@@ -12,13 +12,83 @@ public class C3DBA
 {
 	private static final String NOT_FOUND = "no results found";
 	private static final String C3DB = "jdbc:sqlite:c3db.db"; // database url
+	private static final String SEL_ALL_FROM = "select * from ";
+	private static final String WHERE = " where ";
+	private static final String EQUALS = " = ?";
+	
 	private Vector<String> rows = new Vector<String>();
 		
+	public void selectAll(String table, String param, String lookUpVal)
+	{
+		Connection con = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try
+		{
+			con = DriverManager.getConnection(C3DB);
+			String sql = buildQuery(table, param, lookUpVal);
+			stmt = con.prepareStatement(sql);
+			
+			if (!lookUpVal.isEmpty())
+				stmt.setString(1, lookUpVal);
+			
+			rs = stmt.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int numberOfColumns = rsmd.getColumnCount();
+			
+			if (rs.next() == false)
+			{
+				System.out.println(NOT_FOUND + "args: " + param);
+			}
+			else
+			{
+				do
+				{
+					String row = "";
+					for (int i = 1; i <= numberOfColumns; i++)
+					{
+						row = row + rs.getString(i) + ";";
+					}
+					rows.add(row);
+				}
+				while (rs.next());
+			}
+			
+			if (stmt != null)
+			{
+				stmt.close();
+			}
+			
+			if (con != null)
+			{
+				con.close();
+			}
+			
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private String buildQuery(String table, String param, String lookUpVal)
+	{
+		if (lookUpVal.isEmpty())
+		{
+			return SEL_ALL_FROM + table;
+		}
+		else
+		{
+			return SEL_ALL_FROM + table + WHERE + param + EQUALS;
+		}
+	}
+
 	public void getBook(String table, String param)
 	{
-		Connection con = null;         
-		PreparedStatement stmt = null; 
-		ResultSet rs = null;           
+		Connection con = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		String result = "";
 		
 		try
