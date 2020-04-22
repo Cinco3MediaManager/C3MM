@@ -10,9 +10,13 @@ public class DBAProtocol
 	
 	private static final String DONE = "done.";
 	private static final String CONNECTING = "Connecting to server...";
-//	private static final String EMPTY = "";
 	private final static String FOUND = "found";
 	private static final String NOT_FOUND = "no results found";
+	
+	private static final String SELECT = "s";
+	private static final String UPDATE = "u";
+	private static final String INSERT = "i";
+	
 	
 	private int state = WAITING; // we always start waiting
 	
@@ -23,10 +27,10 @@ public class DBAProtocol
 		String theOutput = "";
 		String[] args = null;
 		
-		// values needed for query
-		String table = "";
-		String param = ""; 
-		String lookUpVal = "";
+		String queryType = "";
+		String table = "";;
+		String field = "";; 
+		String value = "";;
 		
 		if (state == WAITING)
 		{
@@ -39,38 +43,31 @@ public class DBAProtocol
 			if (theInputs != null)
 			{
 				args = theInputs.split(";");
-				table = args[0]; //should always send at least the table
-				
-				if (args.length == 3)
+				queryType = args[0];
+				table = args[1];
+
+				if (args.length == 4)
 				{
-					param = args[1];
-					lookUpVal = args[2];
-					query.selectAll(table, param, lookUpVal);
+					field = args[2];
+					value = args[3];
 				}
-				else 
+				
+				switch (queryType)
 				{
-					query.selectAll(table, param, lookUpVal); // here only table would have a value, this would return all rows
+					case SELECT:
+						query.select(table, field, value);
+						break;
+					case UPDATE:
+						query.update(table, field, value);
+						break;
+					case INSERT:
+						query.insert(table, field, value);
+						break;
 				}
 			}
 			
 			results = query.getRows();
 			
-//			switch (table) {
-//			case BOOKS:
-//				if (param.equalsIgnoreCase("all"))
-//				{
-//					results = new C3DBA().getBooks();
-//					theOutput = "multiple";
-//				}
-//				else
-//				{
-//					C3DBA bookquery = new C3DBA();
-//					bookquery.selectAll(table, param, lookUpVal);
-//					results = bookquery.getRows();
-//					theOutput = "single";
-//				}
-//				break;
-//			}
 			if (!results.isEmpty())
 			{
 				theOutput = FOUND;

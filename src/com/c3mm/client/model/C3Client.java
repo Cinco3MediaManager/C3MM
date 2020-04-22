@@ -18,15 +18,22 @@ public class C3Client
 	private static final String HOST = "localhost"; //change to connect across computers
 	private static final int PORT = 4000; //change to connect across computers
 	
-//	private String[] values = null;
-	Vector<String> results = new Vector<String>();
+	private static final String SEL = "s";
+//	private static final String UPD = "u";
+//	private static final String INS = "i";
 	
-	private void sendRequest(String table, String field, String value)
+	private static final String BOOKS = "books";
+	private static final String CDS = "cds";
+	
+	Vector<String> results = null;
+	
+	private void sendRequest(String message)
 	{
 		try (Socket socket = new Socket(HOST, PORT); // connect to the server socket. 
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // use this to send requests to server
 				BufferedReader in = new BufferedReader( new InputStreamReader(socket.getInputStream()) ); ) // use this to read response from server 
 		{
+			results = new Vector<String>();
 			String fromServer;
 			String fromClient;
 			
@@ -47,12 +54,7 @@ public class C3Client
 					continue; // skip to read the next server response
 				}
 				
-				/*
-				 * Send the needed arguments for the query.
-				 * The minimum parameter is the table name.
-				 * E.G.: "books;ISBN;1234"
-				 */
-				fromClient = table + DELIMITER + field + DELIMITER + value; // concatenate the parameters needed for query
+				fromClient = message;
 				
 				if (fromClient != null)
 				{
@@ -73,9 +75,10 @@ public class C3Client
 		}
 	}
 	
-	public BookModel getModel(String field, String param)
+	public BookModel getBook(String field, String param)
 	{
-		sendRequest("books", field, param);
+		String message = SEL + DELIMITER + BOOKS + DELIMITER + field + DELIMITER + param;
+		sendRequest(message);
 		String[] values = results.get(0).split(DELIMITER);
 		
 		return new BookModel(Integer.parseInt(values[0]), // id
@@ -90,9 +93,11 @@ public class C3Client
 		);
 	}
 	
-	public List<BookModel> getAll(int limit)
+	public List<BookModel> getAll()
 	{
-		sendRequest("books", "", "");
+		String message = SEL + DELIMITER + BOOKS;
+		
+		sendRequest(message);
 		
 		List<BookModel> books = new LinkedList<>();
 		
@@ -114,6 +119,22 @@ public class C3Client
 		}
 		
 		return books;
+	}
+	
+	public CDModel getCD(String field, String param)
+	{
+		String message = SEL + DELIMITER + CDS + DELIMITER + field + DELIMITER + param;
+		sendRequest(message);
+		String[] values = results.get(0).split(DELIMITER);
 		
+		return new CDModel(Integer.parseInt(values[0]), // id
+				Integer.parseInt(values[1]), // in-stock
+				values[2], // title
+				values[3], // country 
+				values[4], // type
+				values[5], // language
+				values[6], // country
+				values[7]  // type
+		);
 	}
 }

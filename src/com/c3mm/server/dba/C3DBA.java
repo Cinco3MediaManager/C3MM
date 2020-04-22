@@ -17,8 +17,8 @@ public class C3DBA
 	private static final String EQUALS = " = ?";
 	
 	private Vector<String> rows = new Vector<String>();
-		
-	public void selectAll(String table, String param, String lookUpVal)
+	
+	public void select(String table, String field, String value)
 	{
 		Connection con = null;
 		PreparedStatement stmt = null;
@@ -27,11 +27,11 @@ public class C3DBA
 		try
 		{
 			con = DriverManager.getConnection(C3DB);
-			String sql = buildQuery(table, param, lookUpVal);
+			String sql = buildQuery(table, field, value);
 			stmt = con.prepareStatement(sql);
 			
-			if (!lookUpVal.isEmpty())
-				stmt.setString(1, lookUpVal);
+			if (!value.isEmpty())
+				stmt.setString(1, value);
 			
 			rs = stmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -39,7 +39,7 @@ public class C3DBA
 			
 			if (rs.next() == false)
 			{
-				System.out.println(NOT_FOUND + "args: " + param);
+				System.out.println(NOT_FOUND + "args: " + value);
 			}
 			else
 			{
@@ -72,18 +72,18 @@ public class C3DBA
 		}
 	}
 	
-	private String buildQuery(String table, String param, String lookUpVal)
+	private String buildQuery(String table, String field, String value)
 	{
-		if (lookUpVal.isEmpty())
+		if (value.isEmpty())
 		{
 			return SEL_ALL_FROM + table;
 		}
 		else
 		{
-			return SEL_ALL_FROM + table + WHERE + param + EQUALS;
+			return SEL_ALL_FROM + table + WHERE + field + EQUALS;
 		}
 	}
-
+	
 	public void getBook(String table, String param)
 	{
 		Connection con = null;
@@ -94,7 +94,7 @@ public class C3DBA
 		try
 		{
 			con = DriverManager.getConnection(C3DB);
-			String sql = "select * from "+ table + " where isbn = ?";
+			String sql = "select * from " + table + " where isbn = ?";
 			stmt = con.prepareStatement(sql);
 			stmt.setString(1, param);
 			
@@ -138,8 +138,8 @@ public class C3DBA
 		System.out.println(result);
 		
 	}
-
-	public Vector<String> getBooks() 
+	
+	public Vector<String> getBooks()
 	{
 		Vector<String> rows = new Vector<String>();
 		Connection conn = null;
@@ -161,7 +161,7 @@ public class C3DBA
 			while (rs.next())
 			{
 				String row = "";
-				for (int i=1; i<=numberOfColumns; i++)
+				for (int i = 1; i <= numberOfColumns; i++)
 				{
 					row = row + rs.getString(i) + ";";
 				}
@@ -185,14 +185,27 @@ public class C3DBA
 		}
 		return rows;
 	}
-
-	public Vector<String> getRows() {
+	
+	public Vector<String> getRows()
+	{
 		return rows;
 	}
-
-	public void setRows(Vector<String> rows) {
+	
+	public void setRows(Vector<String> rows)
+	{
 		this.rows = rows;
-	}     
+	}
+
+	public void update(String table, String field, String value)
+	{
+		// TODO Auto-generated method stub
 		
+	}
+
+	public void insert(String table, String field, String value)
+	{
+		// TODO Auto-generated method stub
 		
+	}
+	
 }
