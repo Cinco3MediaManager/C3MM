@@ -1,5 +1,7 @@
 package com.c3mm.client.model;
 
+import java.util.HashMap;
+
 public class BookModel extends AbstractMediaModel
 {
 	private String isbn = null;
@@ -17,8 +19,8 @@ public class BookModel extends AbstractMediaModel
 		this.pubDate = "";
 	}
 	
-	public BookModel(int rec_id, String title, String author, int inStock, String pubDate,  String isbn, String country, String type, String language
-			)
+	public BookModel(int rec_id, String title, String author, int inStock, String pubDate, String isbn, String country,
+			String type, String language)
 	{
 		super(rec_id, inStock, title, country, type, language);
 		this.isbn = isbn;
@@ -62,5 +64,20 @@ public class BookModel extends AbstractMediaModel
 	public void setPubDate(String pubDate)
 	{
 		this.pubDate = pubDate;
+	}
+	
+	public HashMap<String, String> getProperties()
+	{
+		HashMap<String, String> props = new HashMap<String, String>();
+		props.put("id", String.valueOf( this.getRecId() ) );
+		props.put("title", this.getTitle());
+		props.put("author", this.getAuthor());
+		props.put("stock", String.valueOf( this.getInStock() ) );
+		props.put("date", this.getPubDate());
+		props.put("isbn", this.getIsbn());
+		props.put("country", this.getCountry());
+		props.put("type", this.getType());
+		props.put("lang", this.getLanguage());
+		return props;
 	}
 }

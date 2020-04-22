@@ -1,14 +1,22 @@
 package com.c3mm.client.controller;
 
 import com.c3mm.client.model.BookModel;
-import com.c3mm.client.view.BookView;
+//import com.c3mm.client.view.BookView;
+import com.c3mm.client.view.View;
 
 public class BookController
 {
 	private BookModel book;
-	private BookView view;
+//	private BookView view;
+	private View view;
 	
-	public BookController(BookModel book, BookView view)
+//	public BookController(BookModel book, BookView view)
+//	{
+//		this.book = book;
+//		this.view = view;
+//	}
+
+	public BookController(BookModel book, View view)
 	{
 		this.book = book;
 		this.view = view;
@@ -36,15 +44,6 @@ public class BookController
 	
 	public void updateView()
 	{
-		view.printBookInfo(
-				book.getTitle(),
-				book.getAuthor(),
-				book.getInStock(),
-				book.getPubDate(),
-				book.getIsbn(),
-				book.getCountry(),
-				book.getType(),
-				book.getLanguage()
-				);
+		view.displayProperties(book.getProperties());
 	}
 }

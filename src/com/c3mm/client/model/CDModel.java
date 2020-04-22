@@ -1,5 +1,7 @@
 package com.c3mm.client.model;
 
+import java.util.HashMap;
+
 public class CDModel extends AbstractMediaModel
 {
 	private String artist;
@@ -42,5 +44,21 @@ public class CDModel extends AbstractMediaModel
 	{
 		this.year = year;
 	}
+	
+	public HashMap<String, String> getProperties()
+	{
+		HashMap<String, String>	props = new HashMap<String, String>();
+		props.put("id", String.valueOf(this.getRecId()));
+		props.put("stock", String.valueOf(this.getInStock()));
+		props.put("title", this.getTitle());
+		props.put("country", this.getCountry());
+		props.put("type", this.getType());
+		props.put("lang", this.getLanguage());
+		props.put("artist", this.getArtist());
+		props.put("year", this.getYear());
+		
+		return props;
+	}
+	
 	
 }

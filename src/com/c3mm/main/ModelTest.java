@@ -3,10 +3,11 @@ package com.c3mm.main;
 import java.util.List;
 
 import com.c3mm.client.controller.BookController;
+import com.c3mm.client.controller.CDController;
 import com.c3mm.client.model.BookModel;
 import com.c3mm.client.model.C3Client;
 import com.c3mm.client.model.CDModel;
-import com.c3mm.client.view.BookView;
+import com.c3mm.client.view.View;
 
 public class ModelTest
 {
@@ -18,6 +19,7 @@ public class ModelTest
 	{
 		C3Client client = new C3Client();
 		List<BookModel> books = client.getAll();
+		View view = new View();
 		
 		for (BookModel book : books)
 		{
@@ -25,24 +27,25 @@ public class ModelTest
 		}
 		
 		BookModel model = client.getBook(FIELD, VALUE);
-		BookView view = new BookView();
 		BookController controller = new BookController(model, view);
 		
 		System.out.println(controller.getBookAuthor());
 		System.out.println(controller.getBookName());
 		
 		controller.updateView();
-		
 		controller.setBookAuthor("The Author");
 		controller.setBookName("My Book");
 		controller.updateView();
 		
-		// starting cd model test
-		
+		// starting cd model test		
 		CDModel cd = client.getCD("title", "cd_title1");
-		System.out.println(cd.getArtist());
-		System.out.println(cd.getTitle());
-		System.out.println(cd.getInStock());
+		CDController cdController = new CDController(cd, view);
+		
+		System.out.println(cdController.getCDName());
+		System.out.println(cdController.getCDYear());
+		
+		cdController.updateView();
+		
 		
 	}
 }
