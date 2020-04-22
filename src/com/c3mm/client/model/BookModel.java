@@ -17,8 +17,8 @@ public class BookModel extends AbstractMediaModel
 		this.pubDate = "";
 	}
 	
-	public BookModel(int rec_id, int inStock, String title, String country, String type, String language, String isbn,
-			String author, String pubDate)
+	public BookModel(int rec_id, String title, String author, int inStock, String pubDate,  String isbn, String country, String type, String language
+			)
 	{
 		super(rec_id, inStock, title, country, type, language);
 		this.isbn = isbn;

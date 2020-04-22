@@ -1,6 +1,9 @@
 package com.c3mm.client.model;
 import java.io.*;
 import java.net.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Vector;
 
 public class C3Client
 {
@@ -15,17 +18,26 @@ public class C3Client
 	private static final String HOST = "localhost"; //change to connect across computers
 	private static final int PORT = 4000; //change to connect across computers
 	
-	private String[] values = null;
+	private static final String SEL = "s";
+//	private static final String UPD = "u";
+//	private static final String INS = "i";
 	
-	public void sendRequest(String table, String value)
+	private static final String BOOKS = "books";
+	private static final String CDS = "cds";
+	
+	Vector<String> results = null;
+	
+	private void sendRequest(String message)
 	{
 		try (Socket socket = new Socket(HOST, PORT); // connect to the server socket. 
 				PrintWriter out = new PrintWriter(socket.getOutputStream(), true); // use this to send requests to server
-				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));) // use this to read response from server 
+				BufferedReader in = new BufferedReader( new InputStreamReader(socket.getInputStream()) ); ) // use this to read response from server 
 		{
+			results = new Vector<String>();
 			String fromServer;
 			String fromClient;
 			
+			// This loop executes every time the server sends a response
 			while ((fromServer = in.readLine()) != null) // read from the server
 			{
 				System.out.println(SERVER + fromServer); // tell me what the server said
@@ -33,16 +45,16 @@ public class C3Client
 				if ( fromServer.equals(DONE) ) // if the server sends "done.", exit the loop and close connection
 					break;
 				
-				if( fromServer.contains(NOT_FOUND) ) // if the query returns no results
+				if( fromServer.contains(NOT_FOUND) ) // if the query returns no results exit the loop
 					break;
 				
-				if( fromServer.contains(DELIMITER) )
+				if( fromServer.contains(DELIMITER) ) // the delimiter indicates we received something back
 				{
-					values = fromServer.split(DELIMITER); // get the values returned by query and split them into an array then break the loop
-					break;
+					results.add(fromServer);
+					continue; // skip to read the next server response
 				}
 				
-				fromClient = table + DELIMITER + value; // concatenate the params needed for query
+				fromClient = message;
 				
 				if (fromClient != null)
 				{
@@ -63,8 +75,66 @@ public class C3Client
 		}
 	}
 	
-	public String[] getValues()
+	public BookModel getBook(String field, String param)
 	{
-		return values;
+		String message = SEL + DELIMITER + BOOKS + DELIMITER + field + DELIMITER + param;
+		sendRequest(message);
+		String[] values = results.get(0).split(DELIMITER);
+		
+		return new BookModel(Integer.parseInt(values[0]), // id
+				values[1], // title
+				values[2], // author
+				Integer.parseInt(values[3]), // in-stock
+				values[4], // publication date
+				values[5], // ISBN
+				values[6], // country
+				values[7], // type
+				values[8]  // language
+		);
+	}
+	
+	public List<BookModel> getAll()
+	{
+		String message = SEL + DELIMITER + BOOKS;
+		
+		sendRequest(message);
+		
+		List<BookModel> books = new LinkedList<>();
+		
+		for (String row : results)
+		{
+			String[] values = row.split(DELIMITER);
+			books.add(
+				new BookModel(Integer.parseInt(values[0]), // id
+					values[1], // title
+					values[2], // author
+					Integer.parseInt(values[3]), // in-stock
+					values[4], // publication date
+					values[5], // ISBN
+					values[6], // country
+					values[7], // type
+					values[8]  // language
+					)
+			);
+		}
+		
+		return books;
+	}
+	
+	public CDModel getCD(String field, String param)
+	{
+		String message = SEL + DELIMITER + CDS + DELIMITER + field + DELIMITER + param;
+		sendRequest(message);
+		String[] values = results.get(0).split(DELIMITER);
+		
+		return new CDModel(Integer.parseInt(values[0]), // id
+				Integer.parseInt(values[1]), // in-stock
+				values[2], // title
+				values[3], // country 
+				values[4], // type
+				values[5], // language
+				values[6], // country
+				values[7]  // type
+		);
 	}
 }
