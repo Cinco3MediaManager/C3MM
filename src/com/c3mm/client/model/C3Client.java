@@ -5,25 +5,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import com.c3mm.client.model.Props.Comms;
+
 public class C3Client
 {
 	/* Constants for program configuration */
-	private static final String NOT_FOUND = "no results found";
-	private static final String DONE = "done.";
-	private static final String DELIMITER = ";"; // string delimiter to break the server's response into an array
 	private static final String SERVER = "Server-> ";
 	private static final String CLIENT = "Client-> ";
 	private static final String UNKNOWN_HOST = "The specified host could not be found: ";
 	private static final String IO_HOST = "Couldn't get I/O for the connection to ";
 	private static final String HOST = "localhost"; //change to connect across computers
 	private static final int PORT = 4000; //change to connect across computers
-	
-	private static final String SEL = "s";
-//	private static final String UPD = "u";
-//	private static final String INS = "i";
-	
-	private static final String BOOKS = "books";
-	private static final String CDS = "cds";
 	
 	Vector<String> results = null;
 	
@@ -42,13 +34,13 @@ public class C3Client
 			{
 				System.out.println(SERVER + fromServer); // tell me what the server said
 				
-				if ( fromServer.equals(DONE) ) // if the server sends "done.", exit the loop and close connection
+				if ( fromServer.equals(Comms.DONE) ) // if the server sends "done.", exit the loop and close connection
 					break;
 				
-				if( fromServer.contains(NOT_FOUND) ) // if the query returns no results exit the loop
+				if( fromServer.contains(Comms.NOT_FOUND) ) // if the query returns no results exit the loop
 					break;
 				
-				if( fromServer.contains(DELIMITER) ) // the delimiter indicates we received something back
+				if( fromServer.contains(Comms.DELIM) ) // the delimiter indicates we received something back
 				{
 					results.add(fromServer);
 					continue; // skip to read the next server response
@@ -77,9 +69,9 @@ public class C3Client
 	
 	public BookModel getBook(String field, String param)
 	{
-		String message = SEL + DELIMITER + BOOKS + DELIMITER + field + DELIMITER + param;
+		String message = Comms.BOOKS_MSG + field + Comms.DELIM + param;
 		sendRequest(message);
-		String[] values = results.get(0).split(DELIMITER);
+		String[] values = results.get(0).split(Comms.DELIM);
 		
 		return new BookModel(Integer.parseInt(values[0]), // id
 				values[1], // title
@@ -95,15 +87,12 @@ public class C3Client
 	
 	public List<BookModel> getAllBooks()
 	{
-		String message = SEL + DELIMITER + BOOKS;
-		
-		sendRequest(message);
-		
+		sendRequest(Comms.BOOKS_ALL);
 		List<BookModel> books = new LinkedList<>();
 		
 		for (String row : results)
 		{
-			String[] values = row.split(DELIMITER);
+			String[] values = row.split(Comms.DELIM);
 			books.add(
 				new BookModel(Integer.parseInt(values[0]), // id
 					values[1], // title
@@ -123,9 +112,9 @@ public class C3Client
 	
 	public CDModel getCD(String field, String param)
 	{
-		String message = SEL + DELIMITER + CDS + DELIMITER + field + DELIMITER + param;
+		String message = Comms.CDS_MSG + field + Comms.DELIM + param;
 		sendRequest(message);
-		String[] values = results.get(0).split(DELIMITER);
+		String[] values = results.get(0).split(Comms.DELIM);
 		
 		return new CDModel(Integer.parseInt(values[0]), // id
 				Integer.parseInt(values[1]), // in-stock
@@ -140,15 +129,12 @@ public class C3Client
 	
 	public List<CDModel> getAllCDs()
 	{
-		String message = SEL + DELIMITER + CDS;
-		
-		sendRequest(message);
-		
+		sendRequest(Comms.CDS_ALL);
 		List<CDModel> cds = new LinkedList<>();
 		
 		for (String row : results)
 		{
-			String[] values = row.split(DELIMITER);
+			String[] values = row.split(Comms.DELIM);
 			cds.add(
 				new CDModel(Integer.parseInt(values[0]), // id
 					Integer.parseInt(values[1]), // in-stock
