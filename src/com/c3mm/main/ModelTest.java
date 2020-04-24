@@ -18,7 +18,7 @@ public class ModelTest
 	public static void main(String[] args)
 	{
 		C3Client client = new C3Client();
-		List<BookModel> books = client.getAll();
+		List<BookModel> books = client.getAllBooks();
 		View view = new View();
 		
 		for (BookModel book : books)
@@ -45,6 +45,13 @@ public class ModelTest
 		System.out.println(cdController.getCDYear());
 		
 		cdController.updateView();
+		
+		List<CDModel> cds = client.getAllCDs();
+		
+		for (CDModel c : cds)
+		{
+			System.out.println(c.getArtist());
+		}
 		
 		
 	}

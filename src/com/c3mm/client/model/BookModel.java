@@ -69,15 +69,15 @@ public class BookModel extends AbstractMediaModel
 	public HashMap<String, String> getProperties()
 	{
 		HashMap<String, String> props = new HashMap<String, String>();
-		props.put("id", String.valueOf( this.getRecId() ) );
-		props.put("title", this.getTitle());
-		props.put("author", this.getAuthor());
-		props.put("stock", String.valueOf( this.getInStock() ) );
-		props.put("date", this.getPubDate());
-		props.put("isbn", this.getIsbn());
-		props.put("country", this.getCountry());
-		props.put("type", this.getType());
-		props.put("lang", this.getLanguage());
+		props.put(Props.ID, String.valueOf( this.getRecId() ) );
+		props.put(Props.TITLE, this.getTitle());
+		props.put(Props.AUTHOR, this.getAuthor());
+		props.put(Props.STOCK, String.valueOf( this.getInStock() ) );
+		props.put(Props.DATE, this.getPubDate());
+		props.put(Props.ISBN, this.getIsbn());
+		props.put(Props.COUNTRY, this.getCountry());
+		props.put(Props.TYPE, this.getType());
+		props.put(Props.LANG, this.getLanguage());
 		return props;
 	}
 }

@@ -93,7 +93,7 @@ public class C3Client
 		);
 	}
 	
-	public List<BookModel> getAll()
+	public List<BookModel> getAllBooks()
 	{
 		String message = SEL + DELIMITER + BOOKS;
 		
@@ -136,5 +136,32 @@ public class C3Client
 				values[6], // country
 				values[7]  // type
 		);
+	}
+	
+	public List<CDModel> getAllCDs()
+	{
+		String message = SEL + DELIMITER + CDS;
+		
+		sendRequest(message);
+		
+		List<CDModel> cds = new LinkedList<>();
+		
+		for (String row : results)
+		{
+			String[] values = row.split(DELIMITER);
+			cds.add(
+				new CDModel(Integer.parseInt(values[0]), // id
+					Integer.parseInt(values[1]), // in-stock
+					values[2], // title
+					values[3], // country 
+					values[4], // type
+					values[5], // language
+					values[6], // country
+					values[7]  // type
+				)
+			);
+		}
+		
+		return cds;
 	}
 }

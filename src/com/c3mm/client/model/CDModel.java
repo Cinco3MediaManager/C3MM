@@ -48,14 +48,14 @@ public class CDModel extends AbstractMediaModel
 	public HashMap<String, String> getProperties()
 	{
 		HashMap<String, String>	props = new HashMap<String, String>();
-		props.put("id", String.valueOf(this.getRecId()));
-		props.put("stock", String.valueOf(this.getInStock()));
-		props.put("title", this.getTitle());
-		props.put("country", this.getCountry());
-		props.put("type", this.getType());
-		props.put("lang", this.getLanguage());
-		props.put("artist", this.getArtist());
-		props.put("year", this.getYear());
+		props.put(Props.ID, String.valueOf(this.getRecId()));
+		props.put(Props.STOCK, String.valueOf(this.getInStock()));
+		props.put(Props.TITLE, this.getTitle());
+		props.put(Props.COUNTRY, this.getCountry());
+		props.put(Props.TYPE, this.getType());
+		props.put(Props.LANG, this.getLanguage());
+		props.put(Props.ARTIST, this.getArtist());
+		props.put(Props.YEAR, this.getYear());
 		
 		return props;
 	}
