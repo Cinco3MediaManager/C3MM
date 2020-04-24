@@ -2,6 +2,23 @@ package com.c3mm.client.model;
 
 import java.util.HashMap;
 
+/**
+ * Books Entity Definition in DB
+ *  book_id  INTEGER       PRIMARY KEY AUTOINCREMENT
+ *                         UNIQUE
+ *                         NOT NULL,
+ *  title    VARCHAR (100) NOT NULL,
+ *  author   VARCHAR (30)  NOT NULL,
+ *  in_stock INTEGER (2)   NOT NULL,
+ *  pub_date DATE (8)      NOT NULL,
+ *  isbn     TEXT (13)     UNIQUE,
+ *  country  VARCHAR (20),
+ *  type     VARCHAR       NOT NULL
+ *                         CONSTRAINT chk_type CHECK (type IN ('print', 'cd', 'e-reader', 'audio-stream') ),
+ *  language VARCHAR (20) 
+ *  
+ * @author S3ry0u5
+ */
 public class BookModel extends AbstractMediaModel
 {
 	private String isbn = null;

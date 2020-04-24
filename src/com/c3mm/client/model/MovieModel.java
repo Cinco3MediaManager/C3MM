@@ -2,18 +2,21 @@ package com.c3mm.client.model;
 
 import java.util.HashMap;
 
-/** Movie Def in  DB
- * movie_id INTEGER PRIMARY KEY AUTOINCREMENT
-                     NOT NULL
-                     UNIQUE,
-    in_stock INTEGER NOT NULL,
-    title    TEXT    NOT NULL,
-    country  TEXT,
-    type             CONSTRAINT chk_type CHECK (type IN ('dvd', 'blue-ray', 'stream', 'tape') ) 
-                     NOT NULL,
-    language TEXT    NOT NULL,
-    director TEXT    NOT NULL,
-    year     TEXT
+/** 
+ * Movie Entity Definition in  DB
+ *  movie_id INTEGER PRIMARY KEY AUTOINCREMENT
+ *                   NOT NULL
+ *                   UNIQUE,
+ *  in_stock INTEGER NOT NULL,
+ *  title    TEXT    NOT NULL,
+ *  country  TEXT,
+ *  type             CONSTRAINT chk_type CHECK (type IN ('dvd', 'blue-ray', 'stream', 'tape') ) 
+ *                   NOT NULL,
+ *  language TEXT    NOT NULL,
+ *  director TEXT    NOT NULL,
+ *  year     TEXT
+ *  
+ * @author S3ry0u5
  */
 public class MovieModel extends AbstractMediaModel
 {

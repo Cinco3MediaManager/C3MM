@@ -2,6 +2,20 @@ package com.c3mm.client.model;
 
 import java.util.HashMap;
 
+/**
+ * CD Entity Definition in DB
+ *  cd_id    INTEGER PRIMARY KEY AUTOINCREMENT,
+ *  in_stock INTEGER NOT NULL,
+ *  title    TEXT    NOT NULL,
+ *  country  TEXT,
+ *  type     TEXT    NOT NULL
+ *                   CONSTRAINT chk_type CHECK (type IN ('single', 'collection', 'course') ),
+ *  language TEXT,
+ *  artist   TEXT    NOT NULL,
+ *  year     TEXT    NOT NULL
+ *  
+ * @author S3ry0u5
+ */
 public class CDModel extends AbstractMediaModel
 {
 	private String artist;
