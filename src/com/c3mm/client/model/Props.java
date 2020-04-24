@@ -13,6 +13,7 @@ public class Props
 	public static final String LANG = "lang";
 	public static final String YEAR = "year";
 	public static final String ARTIST = "artist";
+	public static final String DIRECTOR = "director";
 	
 //	public final static String[] BOOK_COLS = { REC_ID, TITLE, AUTHOR, LOCATION, PUBDATE, STATUS, ISBN };
 	
