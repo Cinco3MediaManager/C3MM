@@ -35,6 +35,9 @@ public class Props
 		
 		public static final String CDS_MSG = SEL + DELIM + Table.CDS + DELIM; 
 		public static final String CDS_ALL = SEL + Comms.DELIM + Table.CDS; 
+		
+		public static final String MOVIES_MSG = SEL + DELIM + Table.MOVIES + DELIM; 
+		public static final String MOVIES_ALL = SEL + Comms.DELIM + Table.MOVIES; 
 	}
 	
 	class Table
