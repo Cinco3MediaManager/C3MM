@@ -29,7 +29,7 @@ public class MovieModel extends AbstractMediaModel
 	public MovieModel()
 	{
 		super();
-		this.setDirector("");
+		this.director = "";
 		this.year = "";
 	}
 	
@@ -37,7 +37,7 @@ public class MovieModel extends AbstractMediaModel
 			String year)
 	{
 		super(rec_id, inStock, title, country, type, language);
-		this.setDirector(director);
+		this.director = director;
 		this.year = year;
 	}
 	

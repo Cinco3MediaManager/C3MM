@@ -8,26 +8,22 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Vector;
 
+import com.c3mm.client.model.Props.Comms;
+
 public class C3DBA
 {
-	private static final String NOT_FOUND = "no results found";
 	private static final String C3DB = "jdbc:sqlite:c3db.db"; // database url
-	private static final String SEL_ALL_FROM = "select * from ";
-	private static final String WHERE = " where ";
-	private static final String EQUALS = " = ?";
 	
 	private Vector<String> rows = new Vector<String>();
+	Connection con = null;
+	PreparedStatement stmt = null;
+	ResultSet rs = null;
 	
-	public void select(String table, String field, String value)
+	public void select(String sql, String value)
 	{
-		Connection con = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		
 		try
 		{
 			con = DriverManager.getConnection(C3DB);
-			String sql = buildQuery(table, field, value);
 			stmt = con.prepareStatement(sql);
 			
 			if (!value.isEmpty())
@@ -39,7 +35,7 @@ public class C3DBA
 			
 			if (rs.next() == false)
 			{
-				System.out.println(NOT_FOUND + "args: " + value);
+				System.out.println(Comms.NOT_FOUND + " sql: " + sql + ", " + value);
 			}
 			else
 			{
@@ -72,137 +68,55 @@ public class C3DBA
 		}
 	}
 	
-	private String buildQuery(String table, String field, String value)
+	public int update(String sql, String value, String recId) throws SQLException
 	{
+		int n = 0;
 		if (value.isEmpty())
-		{
-			return SEL_ALL_FROM + table;
-		}
-		else
-		{
-			return SEL_ALL_FROM + table + WHERE + field + EQUALS;
-		}
-	}
-	
-	public void getBook(String table, String param)
-	{
-		Connection con = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		String result = "";
-		
+			return n;
 		try
 		{
 			con = DriverManager.getConnection(C3DB);
-			String sql = "select * from " + table + " where isbn = ?";
+			con.setAutoCommit(false);
 			stmt = con.prepareStatement(sql);
-			stmt.setString(1, param);
-			
-			rs = stmt.executeQuery();
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int numberOfColumns = rsmd.getColumnCount();
-			
-			if (rs.next() == false)
-			{
-				System.out.println(NOT_FOUND + "args: " + param);
-				result = NOT_FOUND + " --> args: " + param;
-			}
-			else
-			{
-				do
-				{
-					for (int i = 1; i <= numberOfColumns; i++)
-					{
-						result = result + rs.getString(i) + ";";
-					}
-					rows.add(result);
-				}
-				while (rs.next());
-			}
-			
-			if (stmt != null)
-			{
-				stmt.close();
-			}
-			
+			stmt.setString(1, value);
+			stmt.setString(2, recId);
+			n = stmt.executeUpdate();
+			con.commit();
+		}
+		catch (SQLException e)
+		{
+			e.printStackTrace();
 			if (con != null)
 			{
-				con.close();
-			}
-			
-		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		System.out.println(result);
-		
-	}
-	
-	public Vector<String> getBooks()
-	{
-		Vector<String> rows = new Vector<String>();
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try
-		{
-			conn = DriverManager.getConnection(C3DB);
-			
-			String sql = "select * from books";
-			
-			stmt = conn.prepareStatement(sql);
-			
-			rs = stmt.executeQuery();
-			
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int numberOfColumns = rsmd.getColumnCount();
-			
-			while (rs.next())
-			{
-				String row = "";
-				for (int i = 1; i <= numberOfColumns; i++)
+				try
 				{
-					row = row + rs.getString(i) + ";";
+					System.err.print("Transaction is being rolled back");
+					con.rollback();
 				}
-				rows.add(row);
+				catch (SQLException excep)
+				{
+					excep.printStackTrace();
+				}
 			}
-			
+		}
+		finally
+		{
 			if (stmt != null)
 			{
 				stmt.close();
 			}
-			
-			if (conn != null)
-			{
-				conn.close();
-			}
-			
+			con.setAutoCommit(true);
 		}
-		catch (SQLException e)
-		{
-			e.printStackTrace();
-		}
-		return rows;
+		return n;
 	}
+	
 	
 	public Vector<String> getRows()
 	{
 		return rows;
 	}
 	
-	public void setRows(Vector<String> rows)
-	{
-		this.rows = rows;
-	}
-
-	public void update(String table, String field, String value)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void insert(String table, String field, String value)
+	public void insert(String sql, String value)
 	{
 		// TODO Auto-generated method stub
 		

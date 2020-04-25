@@ -1,5 +1,6 @@
 package com.c3mm.server.dba;
 
+import java.sql.SQLException;
 import java.util.Vector;
 import com.c3mm.client.model.Props.Comms;
 
@@ -21,8 +22,7 @@ public class DBAProtocol
 		String[] args = null;
 		
 		String queryType = "";
-		String table = "";;
-		String field = "";;
+		String sql = "";
 		String value = "";;
 		
 		if (state == WAITING)
@@ -33,43 +33,50 @@ public class DBAProtocol
 		else if (state == TRY_QUERY)
 		{
 			C3DBA query = new C3DBA();
+			String recId = "";
 			if (theInputs != null)
 			{
 				args = theInputs.split(";");
 				queryType = args[0];
-				table = args[1];
+				sql = args[1];
 				
-				if (args.length == 4)
+				if (args.length > 2)
 				{
-					field = args[2];
-					value = args[3];
+					value = args[2];
+				}
+				
+				if (args.length > 3)
+				{
+					recId = args[3];
 				}
 				
 				switch (queryType)
 				{
 					case Comms.SEL:
-						query.select(table, field, value);
+						query.select(sql, value);
+						
+						results = query.getRows();
+						if (!results.isEmpty())
+						{
+							theOutput = Comms.FOUND;
+						}
 						break;
 					case Comms.UPD:
-						query.update(table, field, value);
+						try
+						{
+							int n = query.update(sql, value, recId);
+							theOutput = "Rows Updated: " + n;
+						}
+						catch (SQLException e)
+						{
+							e.printStackTrace();
+						}
 						break;
 					case Comms.INS:
-						query.insert(table, field, value);
+						query.insert(sql, value);
 						break;
 				}
 			}
-			
-			results = query.getRows();
-			
-			if (!results.isEmpty())
-			{
-				theOutput = Comms.FOUND;
-			}
-			else
-			{
-				theOutput = Comms.NOT_FOUND;
-			}
-			
 			state = QUERY_DONE;
 		}
 		else

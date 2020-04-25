@@ -19,6 +19,13 @@ public class C3Client
 	
 	Vector<String> results = null;
 	
+	public String selSql = "select * from books where isbn = ?";
+	public String updSql = "update books set author = ? where isbn = ?";
+	public String insSql =
+			"INSERT INTO books (book_id,title,author,in_stock,pub_date,isbn,country,type,language)"
+			+ "		VALUES ('book_id','title','author','in_stock','pub_date','isbn','country','type','language')";
+
+	
 	private void sendRequest(String message)
 	{
 		try (Socket socket = new Socket(HOST, PORT); // connect to the server socket. 
@@ -69,8 +76,12 @@ public class C3Client
 	
 	public BookModel getBook(String field, String param)
 	{
-		String message = Comms.BOOKS_MSG + field + Comms.DELIM + param;
-		sendRequest(message);
+//		String message = Comms.BOOKS_MSG + field + Comms.DELIM + param;
+		// three part message: [queryType];[sql];[value]
+		String qType = "s;";
+		String sql = "select * from books where " + field + " = ?;";
+		String msg = qType + sql + param;
+		sendRequest(msg);
 		String[] values = results.get(0).split(Comms.DELIM);
 		
 		return new BookModel(Integer.parseInt(values[0]), // id
@@ -87,7 +98,10 @@ public class C3Client
 	
 	public List<BookModel> getAllBooks()
 	{
-		sendRequest(Comms.BOOKS_ALL);
+		String qType = "s;";
+		String sql = "select * from books";
+		String msg = qType + sql;
+		sendRequest(msg);
 		List<BookModel> books = new LinkedList<>();
 		
 		for (String row : results)
@@ -112,8 +126,11 @@ public class C3Client
 	
 	public CDModel getCD(String field, String param)
 	{
-		String message = Comms.CDS_MSG + field + Comms.DELIM + param;
-		sendRequest(message);
+		String qType = "s;";
+		String sql = "select * from cds where " + field + " = ?;";
+		String msg = qType + sql + param;
+		//String message = Comms.CDS_MSG + field + Comms.DELIM + param;
+		sendRequest(msg);
 		String[] values = results.get(0).split(Comms.DELIM);
 		
 		return new CDModel(Integer.parseInt(values[0]), // id
@@ -129,7 +146,10 @@ public class C3Client
 	
 	public List<CDModel> getAllCDs()
 	{
-		sendRequest(Comms.CDS_ALL);
+		String qType = "s;";
+		String sql = "select * from cds";
+		String msg = qType + sql;
+		sendRequest(msg);
 		List<CDModel> cds = new LinkedList<>();
 		
 		for (String row : results)
@@ -149,5 +169,61 @@ public class C3Client
 		}
 		
 		return cds;
+	}
+	
+	public void updateCD(String colToUpdate, String updValue, String recId) 
+	{
+		String qType = "u;";
+		String sql = "update cds set " + colToUpdate + " = ? where cd_id = ?;";
+		String params = updValue + ";" +recId;
+		String msg = qType + sql + params;
+		sendRequest(msg);
+	}
+	
+	public MovieModel getMovie(String field, String param)
+	{
+//		String message = Comms.MOVIES_MSG + field + Comms.DELIM + param;
+		String qType = "s;";
+		String sql = "select * from movies where " + field + " = ?;";
+		String msg = qType + sql + param;
+		sendRequest(msg);
+		String[] values = results.get(0).split(Comms.DELIM);
+		
+		return new MovieModel(Integer.parseInt(values[0]), // id
+				Integer.parseInt(values[1]), // in-stock
+				values[2], // title
+				values[3], // country 
+				values[4], // type
+				values[5], // language
+				values[6], // director
+				values[7]  // year
+				);
+	}
+	
+	public List<MovieModel> getAllMovies()
+	{
+		String qType = "s;";
+		String sql = "select * from movies";
+		String msg = qType + sql;
+		sendRequest(msg);
+		List<MovieModel> movies = new LinkedList<>();
+		
+		for (String row : results)
+		{
+			String[] values = row.split(Comms.DELIM);
+			movies.add(
+					new MovieModel(Integer.parseInt(values[0]), // id
+							Integer.parseInt(values[1]), // in-stock
+							values[2], // title
+							values[3], // country 
+							values[4], // type
+							values[5], // language
+							values[6], // director
+							values[7]  // year
+							)
+					);
+		}
+		
+		return movies;
 	}
 }
