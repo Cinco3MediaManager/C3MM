@@ -18,7 +18,7 @@ public abstract class AbstractMediaModel
 		rec_id = 0;
 		inStock = 0;
 		title = "";
-		setCountry("");
+		country = "";
 		type = "";
 		language = "";
 	}
@@ -38,7 +38,7 @@ public abstract class AbstractMediaModel
 		this.rec_id = rec_id;
 		this.inStock = inStock;
 		this.title = title;
-		this.setCountry(country);
+		this.country = country;
 		this.type = type;
 		this.language = language;
 	}
