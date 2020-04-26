@@ -17,7 +17,7 @@ import java.util.HashMap;
  *                         CONSTRAINT chk_type CHECK (type IN ('print', 'cd', 'e-reader', 'audio-stream') ),
  *  language VARCHAR (20) 
  *  
- * @author S3ry0u5
+ * @author power-serge
  */
 public class BookModel extends AbstractMediaModel
 {

@@ -34,7 +34,6 @@ public class BookTest
 		book1.setType("print");
 		book1.setLanguage("english");
 		
-		//display values
 		System.out.println("------------------------------------------");
 		System.out.println("After setting the properties:\nValues should be populated.");
 		System.out.println("------------------------------------------");
