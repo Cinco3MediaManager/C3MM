@@ -131,7 +131,8 @@ public class C3Client
 	public boolean updateBook(String colToUpdate, String updValue, String recId) 
 	{
 		update(Table.BOOKS, colToUpdate, updValue, "book_id", recId);
-		return results.get(0).contains(Comms.ROW_UPD);
+		
+		return !results.get(0).isEmpty();
 	}
 	
 	public CDModel getCD(String field, String param)
@@ -268,7 +269,7 @@ public class C3Client
 	
 	public void insert(Map<String, String> map, String table)
 	{
-		map.remove(Props.ID);
+		map.remove(Props.ID); // id is auto-increment don't need it to insert
 		String qType = "i;";
 		StringBuffer cols = new StringBuffer();
 		StringBuffer vals = new StringBuffer();

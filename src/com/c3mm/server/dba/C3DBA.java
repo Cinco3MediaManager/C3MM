@@ -8,8 +8,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Vector;
 
-import org.sqlite.SQLiteException;
-
 import com.c3mm.client.model.Props.Comms;
 
 public class C3DBA
@@ -71,7 +69,7 @@ public class C3DBA
 		}
 	}
 	
-	public int update(String sql, String value, String recId) throws SQLException, SQLiteException
+	public int update(String sql, String value, String recId) throws SQLException
 	{
 		int n = 0;
 		if (value.isEmpty())
@@ -160,6 +158,4 @@ public class C3DBA
 	{
 		return rows;
 	}
-	
-	
 }

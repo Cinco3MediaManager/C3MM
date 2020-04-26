@@ -14,6 +14,8 @@ public class Props
 	public static final String YEAR = "year";
 	public static final String ARTIST = "artist";
 	public static final String DIRECTOR = "director";
+	public static final String USER = "username";
+	public static final String DUE = "due_date";
 	
 	public static class Comms
 	{
@@ -31,8 +33,6 @@ public class Props
 		public static final String SEL = "s";
 		public static final String UPD = "u";
 		public static final String INS = "i";
-
-		
 		
 	}
 	
@@ -41,6 +41,7 @@ public class Props
 		public static final String BOOKS = "books";
 		public static final String CDS = "cds";
 		public static final String MOVIES = "movies";
+		public static final String CHK_OUT = "co_lists";
 	}
 	
 	public static class Msg
