@@ -49,6 +49,7 @@ public class DBAProtocol
 						{
 							value = args[2];
 						}
+						
 						query.select(sql, value);
 						results = query.getRows();
 						
@@ -75,7 +76,6 @@ public class DBAProtocol
 						}
 						catch (SQLException e)
 						{
-							theOutput = e.getMessage();
 							e.printStackTrace();
 						}
 						break;
@@ -93,7 +93,6 @@ public class DBAProtocol
 						}
 						catch (SQLException e)
 						{
-							theOutput = e.getMessage();
 							e.printStackTrace();
 						}
 						break;
