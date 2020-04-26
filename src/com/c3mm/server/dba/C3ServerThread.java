@@ -31,11 +31,11 @@ public class C3ServerThread extends Thread
 			{
 				outputLine = dbap.processInput(inputLine);
 				
-				if (outputLine.equals(Comms.DONE)) // if server response is done quit loop close connection
-					break;
-				
-				if (outputLine.equals(Comms.NOT_FOUND))
-					break;
+				if (outputLine.contains(Comms.NOT_FOUND))
+				{
+					out.println(outputLine);
+					out.println(Comms.DONE);
+				}
 				
 				if (outputLine.equals(Comms.FOUND))
 				{
@@ -46,7 +46,13 @@ public class C3ServerThread extends Thread
 					out.println(Comms.DONE);
 				}
 				
-				out.println(outputLine); // send the response to the client
+				if (outputLine.contains(Comms.ROW_UPD) || outputLine.contains(Comms.ROW_INS))
+				{
+					out.println(outputLine);
+					out.println(Comms.DONE);
+				}
+				
+				//out.println(outputLine); I am leaving this as a comment but I am pretty sure it's not needed
 			}
 			
 			socket.close();

@@ -2,6 +2,7 @@ package com.c3mm.server.dba;
 
 import java.sql.SQLException;
 import java.util.Vector;
+
 import com.c3mm.client.model.Props.Comms;
 
 public class DBAProtocol
@@ -34,34 +35,39 @@ public class DBAProtocol
 		{
 			C3DBA query = new C3DBA();
 			String recId = "";
+			
 			if (theInputs != null)
 			{
 				args = theInputs.split(";");
 				queryType = args[0];
 				sql = args[1];
 				
-				if (args.length > 2)
-				{
-					value = args[2];
-				}
-				
-				if (args.length > 3)
-				{
-					recId = args[3];
-				}
-				
 				switch (queryType)
 				{
 					case Comms.SEL:
+						if (args.length > 2)
+						{
+							value = args[2];
+						}
 						query.select(sql, value);
-						
 						results = query.getRows();
-						if (!results.isEmpty())
+						
+						if (results.get(0).contains(Comms.NOT_FOUND))
+						{
+							theOutput = results.get(0);
+						}
+						else
 						{
 							theOutput = Comms.FOUND;
 						}
 						break;
+						
 					case Comms.UPD:
+						if (args.length > 3)
+						{
+							value = args[2];
+							recId = args[3];
+						}
 						try
 						{
 							int n = query.update(sql, value, recId);
@@ -69,11 +75,27 @@ public class DBAProtocol
 						}
 						catch (SQLException e)
 						{
+							theOutput = e.getMessage();
 							e.printStackTrace();
 						}
 						break;
+					
 					case Comms.INS:
-						query.insert(sql, value);
+						String [] values = null;
+						if(args.length == 3)
+						{
+							values = args[2].split("%");
+						}
+						try
+						{
+							int n = query.insert(sql, values);
+							theOutput = "Rows Inserted: " + n;
+						}
+						catch (SQLException e)
+						{
+							theOutput = e.getMessage();
+							e.printStackTrace();
+						}
 						break;
 				}
 			}

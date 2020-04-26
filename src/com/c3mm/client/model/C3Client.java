@@ -3,9 +3,13 @@ import java.io.*;
 import java.net.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import com.c3mm.client.model.Props.Comms;
+import com.c3mm.client.model.Props.Msg;
+import com.c3mm.client.model.Props.Table;
 
 public class C3Client
 {
@@ -18,13 +22,6 @@ public class C3Client
 	private static final int PORT = 4000; //change to connect across computers
 	
 	Vector<String> results = null;
-	
-	public String selSql = "select * from books where isbn = ?";
-	public String updSql = "update books set author = ? where isbn = ?";
-	public String insSql =
-			"INSERT INTO books (book_id,title,author,in_stock,pub_date,isbn,country,type,language)"
-			+ "		VALUES ('book_id','title','author','in_stock','pub_date','isbn','country','type','language')";
-
 	
 	private void sendRequest(String message)
 	{
@@ -41,16 +38,22 @@ public class C3Client
 			{
 				System.out.println(SERVER + fromServer); // tell me what the server said
 				
-				if ( fromServer.equals(Comms.DONE) ) // if the server sends "done.", exit the loop and close connection
+				if ( fromServer.contains(Comms.DONE) ) // if the server sends "done.", exit the loop and close connection
 					break;
 				
-				if( fromServer.contains(Comms.NOT_FOUND) ) // if the query returns no results exit the loop
-					break;
+				if( fromServer.contains(Comms.NOT_FOUND) ) // if the query returns no results skip to get the server's last response
+					continue;
 				
 				if( fromServer.contains(Comms.DELIM) ) // the delimiter indicates we received something back
 				{
 					results.add(fromServer);
 					continue; // skip to read the next server response
+				}
+				
+				if( fromServer.contains(Comms.ROW_UPD) || fromServer.contains(Comms.ROW_INS))
+				{
+					results.add(fromServer);
+					continue;
 				}
 				
 				fromClient = message;
@@ -76,32 +79,33 @@ public class C3Client
 	
 	public BookModel getBook(String field, String param)
 	{
-//		String message = Comms.BOOKS_MSG + field + Comms.DELIM + param;
-		// three part message: [queryType];[sql];[value]
-		String qType = "s;";
-		String sql = "select * from books where " + field + " = ?;";
-		String msg = qType + sql + param;
-		sendRequest(msg);
-		String[] values = results.get(0).split(Comms.DELIM);
-		
-		return new BookModel(Integer.parseInt(values[0]), // id
-				values[1], // title
-				values[2], // author
-				Integer.parseInt(values[3]), // in-stock
-				values[4], // publication date
-				values[5], // ISBN
-				values[6], // country
-				values[7], // type
-				values[8]  // language
-		);
+		select(Table.BOOKS, field, param);
+		String[] values; 
+		BookModel book = null;
+		try
+		{
+			values = results.get(0).split(Comms.DELIM);
+			book = new BookModel(Integer.parseInt(values[0]), // id
+					values[1], // title
+					values[2], // author
+					Integer.parseInt(values[3]), // in-stock
+					values[4], // publication date
+					values[5], // ISBN
+					values[6], // country
+					values[7], // type
+					values[8]  // language
+			);
+		}
+		catch (Exception e)
+		{
+			System.err.println("getBook-> " + Msg.BOOK_NF );
+		}
+		return book;
 	}
 	
 	public List<BookModel> getAllBooks()
 	{
-		String qType = "s;";
-		String sql = "select * from books";
-		String msg = qType + sql;
-		sendRequest(msg);
+		select(Table.BOOKS);
 		List<BookModel> books = new LinkedList<>();
 		
 		for (String row : results)
@@ -117,39 +121,48 @@ public class C3Client
 					values[6], // country
 					values[7], // type
 					values[8]  // language
-					)
+				)
 			);
 		}
 		
 		return books;
 	}
 	
+	public boolean updateBook(String colToUpdate, String updValue, String recId) 
+	{
+		update(Table.BOOKS, colToUpdate, updValue, "book_id", recId);
+		return results.get(0).contains(Comms.ROW_UPD);
+	}
+	
 	public CDModel getCD(String field, String param)
 	{
-		String qType = "s;";
-		String sql = "select * from cds where " + field + " = ?;";
-		String msg = qType + sql + param;
-		//String message = Comms.CDS_MSG + field + Comms.DELIM + param;
-		sendRequest(msg);
-		String[] values = results.get(0).split(Comms.DELIM);
+		select(Table.CDS, field, param);
+		String[] values;
+		CDModel cd = null;
+		try 
+		{
+			values = results.get(0).split(Comms.DELIM);
+			cd = new CDModel(Integer.parseInt(values[0]), // id
+					Integer.parseInt(values[1]), // in-stock
+					values[2], // title
+					values[3], // country 
+					values[4], // type
+					values[5], // language
+					values[6], // country
+					values[7]  // type
+			);
+		}
+		catch (Exception e)
+		{
+			System.err.println("getCD-> " + Msg.CD_NF);
+		}
 		
-		return new CDModel(Integer.parseInt(values[0]), // id
-				Integer.parseInt(values[1]), // in-stock
-				values[2], // title
-				values[3], // country 
-				values[4], // type
-				values[5], // language
-				values[6], // country
-				values[7]  // type
-		);
+		return cd;
 	}
 	
 	public List<CDModel> getAllCDs()
 	{
-		String qType = "s;";
-		String sql = "select * from cds";
-		String msg = qType + sql;
-		sendRequest(msg);
+		select(Table.CDS);
 		List<CDModel> cds = new LinkedList<>();
 		
 		for (String row : results)
@@ -171,41 +184,41 @@ public class C3Client
 		return cds;
 	}
 	
-	public void updateCD(String colToUpdate, String updValue, String recId) 
+	public boolean updateCD(String colToUpdate, String updValue, String recId) 
 	{
-		String qType = "u;";
-		String sql = "update cds set " + colToUpdate + " = ? where cd_id = ?;";
-		String params = updValue + ";" +recId;
-		String msg = qType + sql + params;
-		sendRequest(msg);
+		update(Table.CDS, colToUpdate, updValue, "cd_id", recId);
+		return results.get(0).contains(Comms.ROW_UPD);
 	}
 	
 	public MovieModel getMovie(String field, String param)
 	{
-//		String message = Comms.MOVIES_MSG + field + Comms.DELIM + param;
-		String qType = "s;";
-		String sql = "select * from movies where " + field + " = ?;";
-		String msg = qType + sql + param;
-		sendRequest(msg);
-		String[] values = results.get(0).split(Comms.DELIM);
-		
-		return new MovieModel(Integer.parseInt(values[0]), // id
-				Integer.parseInt(values[1]), // in-stock
-				values[2], // title
-				values[3], // country 
-				values[4], // type
-				values[5], // language
-				values[6], // director
-				values[7]  // year
-				);
+		select(Table.MOVIES, field, param);
+		String[] values;
+		MovieModel movie = null;
+		try
+		{
+			values = results.get(0).split(Comms.DELIM);
+			movie = new MovieModel(Integer.parseInt(values[0]), // id
+					Integer.parseInt(values[1]), // in-stock
+					values[2], // title
+					values[3], // country 
+					values[4], // type
+					values[5], // language
+					values[6], // director
+					values[7]  // year
+					);
+			
+		}
+		catch (Exception e)
+		{
+			System.err.println("getMovie-> " + Msg.MOVIE_NF);
+		}
+		return movie;
 	}
 	
 	public List<MovieModel> getAllMovies()
 	{
-		String qType = "s;";
-		String sql = "select * from movies";
-		String msg = qType + sql;
-		sendRequest(msg);
+		select(Table.MOVIES);
 		List<MovieModel> movies = new LinkedList<>();
 		
 		for (String row : results)
@@ -226,4 +239,93 @@ public class C3Client
 		
 		return movies;
 	}
+	
+	private void select(String table)
+	{
+		String msg = Msg.SEL_ALL + table;
+		sendRequest(msg);
+	}
+	
+	private void select(String table, String field, String param)
+	{
+		String msg = Msg.SEL_ALL + table + " where " + field + Msg.Q_MARK + param;
+		sendRequest(msg);
+	}
+	
+	public boolean updateMovie(String colToUpdate, String updValue, String recId) 
+	{
+		update(Table.MOVIES, colToUpdate, updValue, "movie_id", recId);
+		return results.get(0).contains(Comms.ROW_UPD);
+	}
+
+	private void update(String table, String colToUpd, String value, String idCol, String idVal)
+	{
+		String qType = "u;";
+		String sql = "update " + table + " set " + colToUpd + " = ? where " + idCol + Msg.Q_MARK + value + ";" + idVal;
+		String msg = qType + sql;
+		sendRequest(msg);
+	}
+	
+	public void insert(Map<String, String> map, String table)
+	{
+		map.remove(Props.ID);
+		String qType = "i;";
+		StringBuffer cols = new StringBuffer();
+		StringBuffer vals = new StringBuffer();
+		StringBuffer marks = new StringBuffer();
+		
+		Set<String> colsToUpd = map.keySet();
+		
+		for (String s: colsToUpd)
+		{
+			cols.append(s + ",");
+			vals.append(map.get(s) + "%");
+			marks.append("?,");
+		}
+		
+		// Trim last char
+		cols.deleteCharAt(cols.length()-1);
+		vals.deleteCharAt(vals.length()-1);
+		marks.deleteCharAt(marks.length()-1);
+		
+		String sql = "insert into " +  table + " (" + cols + ") VALUES (" + marks + ");";
+		String msg = qType + sql + vals;
+		System.out.println(msg);
+		
+		String[] args = msg.split(Comms.DELIM);
+		
+		for (String s : args)
+			System.out.println(s);
+		String [] args2 = args[args.length-1].split("%");
+		
+		for (String s: args2)
+			System.out.println(s);
+		
+		sendRequest(msg);
+	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
